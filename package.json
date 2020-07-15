@@ -1,10 +1,13 @@
 {
-  "name": "vite",
-  "version": "1.0.0-beta.11",
+  "name": "@csr632/vite",
+  "version": "1.0.0-beta.14",
   "license": "MIT",
   "author": "Evan You",
   "bin": {
     "vite": "bin/vite.js"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "main": "dist/node/index.js",
   "types": "dist/node/index.d.ts",
@@ -57,7 +60,7 @@
     "@types/koa": "^2.11.3",
     "@types/lru-cache": "^5.1.0",
     "@vue/compiler-dom": "^3.0.0-beta.14",
-    "@vue/compiler-sfc": "^3.0.0-beta.14",
+    "@vue/compiler-sfc": "npm:@csr632/vue-compiler-sfc@3.0.0-beta.22",
     "brotli-size": "^4.0.0",
     "chalk": "^4.0.0",
     "chokidar": "^3.3.1",

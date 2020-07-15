@@ -9,7 +9,8 @@ import {
   cssPreprocessLangRE,
   getCssImportBoundaries,
   rewriteCssUrls,
-  isCSSRequest
+  isCSSRequest,
+  preProcessIncludedFilesMap
 } from '../utils/cssUtils'
 import qs from 'querystring'
 import chalk from 'chalk'
@@ -46,7 +47,8 @@ export const cssPlugin: ServerPlugin = ({ root, app, watcher, resolver }) => {
       if (
         !cssImportMap.has(filePath) &&
         !processedCSS.has(publicPath) &&
-        !srcImportMap.has(filePath)
+        !srcImportMap.has(filePath) &&
+        !preProcessIncludedFilesMap.has(filePath)
       ) {
         return debugCSS(
           `${basename(publicPath)} has changed, but it is not currently in use`
@@ -65,6 +67,15 @@ export const cssPlugin: ServerPlugin = ({ root, app, watcher, resolver }) => {
       // it cannot be handled as normal css because the js exports may change
       if (filePath.endsWith('.module.css')) {
         moduleCssUpdate(filePath, resolver)
+      }
+
+      if (preProcessIncludedFilesMap.has(filePath)) {
+        for (let preprocessImporter of preProcessIncludedFilesMap.get(
+          filePath
+        )!) {
+          normalCssUpdate(resolver.fileToRequest(preprocessImporter))
+        }
+        return
       }
 
       const boundaries = getCssImportBoundaries(filePath)

@@ -105,6 +105,19 @@ export async function compileCss(
     postcssPlugins
   })
 
+  // record css preprocess dependencies(.e.g sass @import)
+  if (res.preProcessIncludedFiles) {
+    res.preProcessIncludedFiles
+      .filter((file) => file !== filename)
+      .forEach((file) => {
+        if (preProcessIncludedFilesMap.has(file)) {
+          preProcessIncludedFilesMap.get(file)!.add(filename)
+        } else {
+          preProcessIncludedFilesMap.set(file, new Set([filename]))
+        }
+      })
+  }
+
   // record css import dependencies
   if (res.rawResult) {
     res.rawResult.messages.forEach((msg) => {
@@ -161,9 +174,14 @@ export async function resolvePostcssOptions(root: string, isBuild: boolean) {
   }
 }
 
+export const preProcessIncludedFilesMap = new Map<
+  string /*importee*/,
+  Set<string /*importer*/>
+>()
+
 export const cssImportMap = new Map<
-  string /*filePath*/,
-  Set<string /*filePath*/>
+  string /*importee*/,
+  Set<string /*importer*/>
 >()
 
 export function getCssImportBoundaries(
